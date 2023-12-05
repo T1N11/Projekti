@@ -162,6 +162,7 @@ main {
 .foot {
     margin-top: 60px;
     padding-bottom: 20px;
+    padding-top: 20px;
     color: white;
     display: flex;
     justify-content: space-around;
@@ -203,6 +204,69 @@ main {
     border-radius: 5px;
 }
 
+.watch-container {
+    background-color: #171717;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 80px;
+    margin-bottom: 80px;
+
+}
+
+.video-player{
+    margin-top: 50px;
+    
+}
+
+video {
+    width: 80vw;
+}     
+
+.info-container {
+    color: white;
+    background-color: #171717;
+    display: flex;
+    justify-content: center;
+    width: 80vw;
+    margin-left:8vw;
+    margin-bottom: 80px;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.info-sub-container{
+    display: flex;
+    justify-content: flex-start;
+    width: inherit;
+}
+
+.info-poster img{
+    border-radius: 10%;
+}
+
+.info {
+    display:flex;
+    flex-direction: column;
+    justify-content: flex;
+    gap: 30px;
+    padding: 20px 0 0 20px;
+}
+
+.imdb {
+    display:flex;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.imdb i{ 
+    color:gold;
+}
+
+
 
 @media screen and (max-width: 600px) {
     .topnav a:not(:first-child) {
@@ -238,7 +302,16 @@ main {
     }
 
     .foot div {
-        padding-top: 10px;
+        margin-top: 20px;
+    }
+
+    .info-sub-container {
+        flex-direction: column;
+        font-size: 15px;
+    }
+    .info-poster img{
+        width: 200px;
+        height: 300px;
     }
 
 }
