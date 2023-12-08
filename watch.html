@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="axes.png">
     <link rel="stylesheet" href="css/movies.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
 
 
-    <title>Document</title>
+    <title>MovieOrk</title>
 </head>
 <body>
     <header>
@@ -26,26 +27,31 @@
 
     <div class="watch-container">
         <div class="video-player">
-            <video  controls>
-                <source src="mp4/FURY.mp4" type="video/mp4">
+            <video id="movie-player" controls>
+                <source id="video-source" src="" type="video/mp4">
             </video>
         </div>
     </div>
     <div class="info-container">
         <div class="info-sub-container">
             <div class="info-poster">
-                <img src="posters/fury-movie-poster-md.png" alt="">
+                <img id='info-poster' src="" alt="">
             </div>
             <div class="info">
-                <h1>Title: FURY</h1>
+                <div class="watch-title">
+                    <h2>Title:</h2>
+                    <h2 id="title"></h2>
+                </div>
                 <div class="imdb">
-                    <h4>IMDB: 8.7 </h4>
+                    <h4>IMDB: </h4>
+                    <h4 id="rating"></h4>
                     <i class="fa fa-star-half-full"></i>
                 </div>
 
-
-                <p><b>Description:</b> <br><br>In April 1945, as the Allies make their final push in the European Theater, a battle-hardened Army sergeant named Wardaddy commands a five-man Sherman tank crew on a deadly mission behind enemy lines.<br>
-                     Outnumbered, out-gunned, and with a rookie soldier thrust into their platoon, Wardaddy and his men face overwhelming odds in their heroic attempts to defend a field hospital from Waffen SS troops. </p>     
+                <div class="description-container">
+                    <p><b>Description: </b></p>
+                    <p id="desc"></p>     
+                </div>
                 
 
             </div>

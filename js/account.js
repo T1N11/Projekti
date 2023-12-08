@@ -34,3 +34,13 @@ function validateReg() {
         return false;
     }
 }
+
+function validateReg() {
+    var email = document.getElementById('emai').value;
+    var password = document.getElementById('password');
+
+    var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
+    if(!emailRegex.test(email)) {
+        alert("Please enter a valid email address!");
+    }
+}
