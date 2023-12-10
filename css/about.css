@@ -65,7 +65,8 @@ main{
 
     gap:50px;
     background-color: #171717;
-    border: solid white;
+    /* border: solid white; */
+    border-radius: 10px;
 
 }
 
