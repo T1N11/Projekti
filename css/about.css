@@ -40,6 +40,98 @@ body {
     display: none;
 }
 
+main{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    margin-top: 30px;
+    color: white;
+}
+.title {
+    display: flex;
+
+}
+
+.title h1:not(:first-child) {
+    color: green;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 50px;
+
+    gap:50px;
+    background-color: #171717;
+    border: solid white;
+
+}
+
+.sub-container-1 {
+
+    margin: 10px;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#about {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 50px;
+}
+
+.sub-container-2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+
+}
+
+.sub-container-2 form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+}
+
+.sub-container-2 form{
+    max-width: 300px;
+}
+
+.email {
+    display: flex;
+    flex-direction: column;
+}
+
+form input, form textarea {
+    background: #dfe9f5;
+
+}
+button { 
+    font-size: 1.1rem;
+    margin: 20px;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    border:none;
+    width: 30%;
+    background-color: #004898;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background: blue;
+}
+
+
 
 
 @media screen and (max-width: 600px) {
