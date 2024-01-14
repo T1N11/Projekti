@@ -42,3 +42,4 @@ switch(videoLink) {
 
 videoSource.src = videoLink;
 videoPlayer.play();
+

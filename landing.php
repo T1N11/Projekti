@@ -1,3 +1,8 @@
+<?php
+    session_Start();
+    $loggedIn = isset($_SESSION['user-email']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -13,11 +18,18 @@
             <div class="navbar">
 
                 <div class="topnav" id="myTopnav"> 
-                    <a href="landing.html" id="logo">MovieOrk</a>
-                    <a href="landing.html" class="active">Home</a>
-                    <a href="movies.html">Movies</a>
-                    <a href="about.html">About</a>
-                    <a href="account.html">Account</a>
+                    <a href="landing.php" id="logo">MovieOrk</a>
+                    <a href="landing.php" class="active">Home</a>
+                    <a href="movies.php">Movies</a>
+                    <a href="about.php">About</a>
+
+                    <?php
+                        if($loggedIn) {
+                            echo '<a href="" onclick="logout();">LogOut</a>';
+                        } else {
+                            echo '<a href="account.php">Account</a>';
+                        }
+                    ?>
                     <a href="javascript:void(0);" class="icon" onclick="myFunction()">
                         <i class="fa fa-bars"></i>
                     </a>
@@ -71,5 +83,6 @@
 
 
     <script src="js/landing.js"></script>
+    <script src="logout.js"></script>
     </body>
 </html>

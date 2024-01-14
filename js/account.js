@@ -13,34 +13,42 @@ function validateReg() {
     var confirmPassword = document.getElementById('confirmPassword').value;
 
     var nameRegex = /^[a-zA-z\s]+$/;
+    var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
+
+    var errorMessage = "";
+
     if(!nameRegex.test(username)) {
-        alert('Please enter a valid name!');
-        return false;
+        errorMessage += 'Please enter a username!\n';
     }
 
-    var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
     if(!emailRegex.test(email)) {
-        alert("Please enter a valid email address!");
-        return false;
+        errorMessage += 'Please enter a valid email!\n';
+        
     }
 
     if(password.length < 6) {
-        alert('Password must be at least 6 characters!');
-        return false;
+        errorMessage += 'Password must be longer than 6!\n';
     }
 
     if (confirmPassword !== password) {
-        alert('Passwords do not match');
+        errorMessage += 'Passwords do not match!\n';
+    }
+    if(errorMessage !== "") {
+        document.getElementById('error-message').innerText= errorMessage;
         return false;
     }
+
+    document.getElementById('error-message').innerText="";
+    return true;
 }
 
-function validateReg() {
-    var email = document.getElementById('emai').value;
-    var password = document.getElementById('password');
+function validateLog() {
+    var email = document.getElementById('email').value;
+
 
     var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
     if(!emailRegex.test(email)) {
         alert("Please enter a valid email address!");
     }
 }
+
