@@ -26,6 +26,31 @@
             echo "<h3 style='background-color: red; text-align: center;'>Movie already exists in the database!</h3>";
         }
     }
+
+    if (isset($_POST['update'])) {
+        $movieid = mysqli_real_escape_string($dbconn->getConnection(), $_POST['movieid']);
+        $title = mysqli_real_escape_string($dbconn->getConnection(), $_POST['title']);
+        $duration = $_POST['duration'];
+        $releaseyear = $_POST['releaseyear'];
+    
+        if ($dbconn->updateMovie($movieid, $title, $duration, $releaseyear)) {
+            header('Location: dashboard.php');
+            echo "<h3 style='background-color: green; text-align: center;'>The Movie has been updated!</h3>";
+        } else {
+            echo "<h3 style='background-color: red; text-align: center;'>Failed to update the movie!</h3>";
+        }
+    }
+
+    if (isset($_POST['delete'])) {
+        $movieid = mysqli_real_escape_string($dbconn->getConnection(), $_POST['movieid']);
+
+        if($dbconn->deleteMovie($movieid)) {
+            header('Location: dashboard.php');
+        } else {
+            echo "<h3 style='background-color: red; text-align: center;'>Failed to delete the movie!</h3>";
+        }
+    }
+
     $dbconn->closeConnection();
 ?>
 
@@ -79,15 +104,38 @@
                             <td><?= $movie['poster'] ?></td>
                             <td>
                                 <div class="buttons">
-                                    <form action="" method="post"></form>
-                                    <button>edit</button>
-                                    <button style="background-color: red;">Delete</button>
+                                    <button onclick="openModal(
+                                        '<?= $movie['movieid'] ?>',
+                                        '<?= $movie['title'] ?>',
+                                        '<?= $movie['duration'] ?>',
+                                        '<?= $movie['releaseyear'] ?>',
+                                        '<?= $movie['rating'] ?>')">edit</button>                                
+                                        <form action="" method="post">
+                                            <input type="hidden" name="movieid" value="<?= $movie['movieid'] ?>">
+                                            <button type="submit" name="delete" style="background-color: red;">Delete</button>
+                                        </form>
                                 </div>
                             </td>
 
                             </tr>
                         <?php endforeach; ?>
                 </table>
+
+                <div id="editModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <form class="dash-form" action="" method="post" enctype="multipart/form-data">
+                            <h2>Edit Data</h2>
+                            <input type="text" id="show-id" name="movieid" readonly>
+                            <input type="text" id="edit-title" name="title" placeholder="Title" required>
+                            <input type="number" id="edit-duration" name="duration" placeholder="Duration" required>
+                            <input type="number" id="edit-releaseyear" name="releaseyear" placeholder="ReleaseYear" required>
+                            <input type="float" id="edit-rating" name="rating" placeholder="Rating" required>
+                            <!-- <input type="text" id="edit-description" name="description" placeholder="Description"> -->
+                            <button name="update" id="update">Update</button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
                 <div class="form">
@@ -108,7 +156,7 @@
         
     <script src="js/movies.js"></script>
     <script src="logout.js"></script>
-
+    <script src="js/dashboard.js"></script>
 
 </body>
 </html>
@@ -226,7 +274,7 @@
     background-color: #004898;
     color: #fff;
     cursor: pointer;
-}
+}   
 
     button:hover {
         background: blue;
@@ -272,6 +320,50 @@
         background: #171717;
     }
 
+    .modal {
+        display: none;
+        position: fixed;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .modal-content input {
+        width: 65%;
+        outline: none;
+        border: none;
+        background: #dfe9f5;
+        padding: 12px 14px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+    }
+
+    /* Style for the close button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
     @media screen and (max-width: 600px) {
     .topnav a:not(:first-child) {
         display: none;
@@ -301,5 +393,6 @@
     }
 }
 </style>
+
 
 

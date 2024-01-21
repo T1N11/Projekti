@@ -184,6 +184,21 @@ class DataBaseConnection {
     
         return 'user';
     }
+    public function updateMovie($movieid, $title, $duration, $releaseyear) {
+        $query = "UPDATE movies SET title='$title', duration='$duration', releaseyear='$releaseyear' WHERE movieid='$movieid'";
+        
+        $complete = mysqli_query($this->conn, $query);
+        
+        return $complete;
+    }
+
+    public function deleteMovie($movieid) {
+        $query = "DELETE from movies where movieid = '$movieid'";
+
+        $complete = mysqli_query($this->conn, $query);
+
+        return $complete;
+    }
     public function closeConnection() {
         mysqli_close($this->conn);
     }
