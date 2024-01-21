@@ -24,8 +24,11 @@
                     <a href="about.php">About</a>
 
                     <?php
-                        if($loggedIn) {
-                            echo '<a href="" onclick="logout();">LogOut</a>';
+                        if ($loggedIn) {
+                            if ($_SESSION['user-role'] === 'admin') {
+                                echo '<a href="dashboard.php">Dashboard</a>';
+                            }
+                            echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
                         } else {
                             echo '<a href="account.php">Account</a>';
                         }

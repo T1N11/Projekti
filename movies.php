@@ -2,17 +2,19 @@
 <?php
     include 'php/dbconn.php';
     session_start();
-
     $loggedIn = isset($_SESSION['user-email']);
+
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
     // $movieData = $dbconn->get_MovieData();
     $totalMovies = $dbconn->totalMovies();
     $moviesPerPage = 12;
     $totalPages = ceil($totalMovies / $moviesPerPage);
-    $currentPage = isset($GET['page']) ? $_GET['page'] : 1;
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
     $startIndex = ($currentPage - 1) * $moviesPerPage;
     $movieData = $dbconn->get_ByPage($startIndex, $moviesPerPage);
+
+
     $dbconn->closeConnection();
 
 ?>
@@ -35,8 +37,11 @@
                 <a href="movies.php" class="active">Movies</a>
                 <a href="about.php">About</a>
 
-                <?php
-                    if (isset($_SESSION['user-email'])) {
+                 <?php
+                    if ($loggedIn) {
+                        if ($_SESSION['user-role'] === 'admin') {
+                            echo '<a href="dashboard.php">Dashboard</a>';
+                        }
                         echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
                     } else {
                         echo '<a href="account.php">Account</a>';
@@ -58,15 +63,17 @@
                 </div>
                 <div class="posters">
                     <div class="movies">
-                        <?php foreach ($movieData as $movie): ?>
+                        <?php foreach ($movieData as $movie): {
+                                $movieUrl = 'watch.php?video=mp4/' . $movie['videofile'] . '&id=' . $movie['movieid'];
+                        }?>
                             <div class="movie">
-                                <a href="watch.php?video=mp4/<?= $movie['Title']  ?>.mp4">
-                                    <img src="posters/<?= $movie['Poster'] ?>" alt="">
+                                <a href=<?= $movieUrl ?>>
+                                    <img src="posters/<?= $movie['poster'] ?>" alt="">
                                 </a>
                                 <div class="movie-info">
-                                    <a href="watch.php?video=mp4/<?= $movie['Title'] ?>.mp4">
-                                        <h3><?= $movie['Title'] ?></h3>
-                                        <p><?= $movie['ReleaseYear'] ?> · <?= $movie['Duration'] ?>min</p>
+                                    <a href="watch.php?video=mp4/<?= $movie['videofile'] ?>">
+                                        <h3><?= $movie['title'] ?></h3>
+                                        <p><?= $movie['releaseyear'] ?> · <?= $movie['duration'] ?>min</p>
                                     </a>
                                 </div>
                             </div>
@@ -91,7 +98,12 @@
                 </ul>
             </div>
 
-            <footer> 
+            
+
+         
+        </main>
+                        
+        <footer> 
                 <div class="foot">
                     <div class="about">
                         
@@ -113,12 +125,9 @@
                 </div> 
                 
             </footer>
-         
-        </main>
-
-
-
-    <script src="js/movies.js"></script>
-    <script src="logout.js"></script>
+        <script src="js/movies.js"></script>
+        <script src="logout.js"></script>
     </body>
 </html>
+
+

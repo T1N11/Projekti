@@ -1,6 +1,21 @@
 <?php
+    include 'php/dbconn.php';
     session_start();
     $loggedIn = isset($_SESSION['user-email']);
+
+    $dbconn = new DataBaseConnection();
+    $dbconn->startConnection();
+
+    $movieId = isset($_GET['id']) ? $_GET['id'] : null;
+
+    if ($movieId !== null) {
+        $movieDetails = $dbconn->get_MovieByID($movieId);
+
+        if ($movieDetails !== null) {
+            $_SESSION['current_movie'] = $movieDetails;
+        }
+    }
+
 ?>
 
 <!DOCTYPE html>
@@ -24,12 +39,15 @@
             <a href="movies.php" >Movies</a>
             <a href="about.php" >About</a>
             <?php
-                if($loggedIn) {
-                    echo '<a href="" onclick="logout();">LogOut</a>';
-                } else {
-                    echo '<a href="account.php">Account</a>';
-                }
-            ?>
+                    if ($loggedIn) {
+                        if ($_SESSION['user-role'] === 'admin') {
+                            echo '<a href="dashboard.php">Dashboard</a>';
+                        }
+                        echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
+                    } else {
+                        echo '<a href="account.php">Account</a>';
+                    }
+                ?>
             <a href="javascript:void(0);" class="icon" onclick="resnav()">
                 <i class="fa fa-bars"></i>
             </a>
@@ -46,22 +64,22 @@
     <div class="info-container">
         <div class="info-sub-container">
             <div class="info-poster">
-                <img id='info-poster' src="" alt="">
+                <img id='info-poster' src="posters/<?= $movieDetails['poster'] ?>" alt="">
             </div>
             <div class="info">
                 <div class="watch-title">
                     <h2>Title:</h2>
-                    <h2 id="title"></h2>
+                    <h2 id="title"><?= $movieDetails['title'] ?></h2>
                 </div>
                 <div class="imdb">
                     <h4>IMDB: </h4>
                     <h4 id="rating"></h4>
-                    <i class="fa fa-star-half-full"></i>
+                    <i class="fa fa-star-half-full"><?= $movieDetails['rating'] ?></i>
                 </div>
 
                 <div class="description-container">
                     <p><b>Description: </b></p>
-                    <p id="desc"></p>     
+                    <p id="desc"><?= $movieDetails['description'] ?></p>     
                 </div>
                 
 
@@ -96,3 +114,4 @@
     <script src="logout.js"></script>
 </body>
 </html>
+

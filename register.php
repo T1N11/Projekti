@@ -56,7 +56,7 @@
             <p class="recover">
                 <a href="#">Recover Password</a>
             </p>
-            <button name="submit" >Register</button>
+            <button name="submit" onclick="validateReg()" >Register</button>
             <!-- onclick='validateReg();' -->
             <div class="Already signed in?">
                 Already signed in? <a href="account.php">Log in</a>

@@ -59,7 +59,7 @@
             <h1>MovieOrk</h1>
             <p>Would you like to, <br>log in!</p>
     
-            <form action="" method="post" onsubmit=" return validateLog();">
+            <form action="" method="post" onsubmit="return validateLog();">
                 <input type="email" name="email" placeholder="Enter your email..." required>
                 <input type="password" name="password" placeholder="Password" required>
                 <p class="recover">

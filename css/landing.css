@@ -6,13 +6,11 @@
     font-family: 'Montserrat', sans-serif;
 
 }
-body {
-    margin: 0;
-}
 
 .topnav {
     overflow: hidden;
     background-color:#004898;
+
 }
 
 .topnav a {

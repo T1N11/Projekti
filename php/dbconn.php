@@ -16,6 +16,10 @@ class DataBaseConnection {
             return $this->conn;
         }
     }  
+
+    public function getConnection() {
+        return $this->conn;
+    }
     public function emailExists($email) {
         $query = "SELECT COUNT(*) as count FROM users WHERE email = '$email'";
         $result = mysqli_query($this->conn, $query);
@@ -49,7 +53,7 @@ class DataBaseConnection {
     
         if ($this->emailExists($email)) {
             $errorMessage .= 'Email already exists!<br>';
-            echo "<h3 style='color: red; text-align: center;'> Email already exists! </h3>";
+            echo "<h3 style='color: red; text-align: center;'> Email already exists!</h3>";
         }
         
         return ($errorMessage === "") ? true : $errorMessage;
@@ -79,6 +83,36 @@ class DataBaseConnection {
     }
 
     //Movie-Section:
+
+
+    public function movieExists($title) {
+        $query = "SELECT COUNT(*) as count FROM movies WHERE title = '$title'";
+        $result = mysqli_query($this->conn, $query);
+
+        if ($result) {
+            $row = mysqli_fetch_assoc($result);
+            return $row['count'] > 0;
+        } else {
+            echo "Error while checking the existence of movie: " . mysqli_error($this->conn);
+            return false;
+        }
+    }
+
+    public function insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description) {
+        $query = "INSERT INTO movies (title, duration, rating, releaseyear, poster, videofile, description) VALUES ('$title', '$duration', '$rating', '$releaseyear', '$poster', '$videofile', '$description')";
+
+        
+        if ($this->movieExists($title)) {
+            // Movie already exists, return false or handle accordingly
+            return false;
+        } else if(mysqli_query($this->conn, $query)) {
+            return true;
+        } else {
+            echo mysqli_error($this->conn);
+            return false;
+        }
+    }
+
     function get_MovieData() {
         $query = "SELECT * FROM movies";
         $results = mysqli_query($this->conn, $query);
@@ -92,7 +126,21 @@ class DataBaseConnection {
 
         return $movies;
     }
+    
+    function get_MovieByID($ID) {
+        $query = "SELECT * FROM movies where movieid = '$ID'";
+        $result = mysqli_query($this->conn, $query);
+        $movies = [];
 
+        if ($result && mysqli_num_rows($result) > 0) {
+            $movieDetails = mysqli_fetch_assoc($result);
+            return $movieDetails;
+        } else {
+            return null; 
+        }
+
+        return $movies;
+    }
     function totalMovies() {
         $query = "SELECT COUNT(*) as count FROM movies";
         $results = mysqli_query($this->conn, $query);

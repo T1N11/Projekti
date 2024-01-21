@@ -7,14 +7,19 @@
 }
 body {
     background-color: #111;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
 }
+
+
 .topnav {
     overflow: hidden;
     background-color: #004898;
-    height: auto;
+    /* height: auto; */
 }
 
-.topnav a{
+.topnav a   {
     float: left;
     display: block;
     color: #f2f2f2;
@@ -41,14 +46,14 @@ body {
 main {
     /* display: flex; */
     margin-top: 50px;
-    
-    height: 90vh;
+    height: 100%;       
 }
 .posters {
     background-color: #171717;
     display: flex;
     margin: 0 auto;
     max-width: 900px;
+
     justify-content: space-between;
     padding: 0 0 10px 0; 
     border-radius: 30px;
@@ -95,7 +100,8 @@ main {
 .navpage {
     color: white;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 20px;
 }
 
@@ -164,9 +170,14 @@ main {
     gap: 10px;
 }
 
+footer {
+    background-color: black;
+    bottom: 0;
+    width: 100vw;
+    height: 10vh;
+}
+
 .foot {
-    margin-top: 60px;
-    padding-bottom: 20px;
     padding-top: 20px;
     color: white;
     display: flex;
