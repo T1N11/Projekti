@@ -1,21 +1,35 @@
 <?php
     include 'php/dbconn.php';
+    include 'php/MovieController.php';
     session_start();
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
+    $movieController = new MovieController($dbconn);
 
     $movieId = isset($_GET['id']) ? $_GET['id'] : null;
 
     if ($movieId !== null) {
-        $movieDetails = $dbconn->get_MovieByID($movieId);
+        $movieDetails = $movieController->getMovieByID($movieId);
 
         if ($movieDetails !== null) {
             $_SESSION['current_movie'] = $movieDetails;
         }
     }
 
+    if (isset($_POST['add'])) {
+        $movieDetails = $movieController->getMovieByID($movieId);
+
+        $movieController->addToWatchList($_SESSION['user-email'], $movieId);
+        header("location: watchlist.php?added=1");
+        echo "wtf";
+    } 
+    if(isset($_POST['remove'])) {
+        $movieController->removeFromWatchList($_SESSION['user-email'], $movieId);
+        header("location: watchlist.php?added=0");
+
+    }
 ?>
 
 <!DOCTYPE html>
@@ -36,18 +50,21 @@
         <div class="topnav" id="myTopnav">
             <a href="landing.php">MovieOrk</a>
             <a href="landing.php">Home</a>
-            <a href="movies.php" >Movies</a>
+            <a href="movies.php?page=<?= $_SESSION['mov-page'] ?>"  >Movies</a>
             <a href="about.php" >About</a>
+            <a href="contact.php">Contact Us </a>
             <?php
-                    if ($loggedIn) {
-                        if ($_SESSION['user-role'] === 'admin') {
-                            echo '<a href="dashboard.php">Dashboard</a>';
+                        if ($loggedIn) {
+                            if ($_SESSION['user-role'] === 'admin') {
+                                echo '<a href="dashboard.php">Dashboard</a>';
+                            }else{
+                                echo '<a href="watchlist.php">WatchList</a>';
+                            }
+                            echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
+                        } else {
+                            echo '<a href="account.php">Account</a>';
                         }
-                        echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
-                    } else {
-                        echo '<a href="account.php">Account</a>';
-                    }
-                ?>
+                    ?>
             <a href="javascript:void(0);" class="icon" onclick="resnav()">
                 <i class="fa fa-bars"></i>
             </a>
@@ -82,7 +99,23 @@
                     <p id="desc"><?= $movieDetails['description'] ?></p>     
                 </div>
                 
+                <div class="info-but-container">
+                    <form action="" method='post' onsubmit="handleWatchlistAction()">
+                        <?php  
+                        if($loggedIn) {
+                            $isInWatchlist = $movieController->inWatchList($_SESSION['user-email'], $movieId);
 
+                            if ($isInWatchlist) {
+                                echo '<button style="background-color: red;" type="submit" name="remove" id="info-button"><b>-</b>Remove from WatchList</button>';
+                            } else {
+                                echo '<button type="submit" name="add" id="info-button"><b>+</b> Add to WatchList</button>';
+                            }
+                        } 
+
+                        ?>
+                    </form>
+                </div>
+            
             </div>
         </div>
     </div>
@@ -113,5 +146,6 @@
     <script src="js/movies.js"></script>
     <script src="logout.js"></script>
 </body>
-</html>
+<script src="logout.js"></script>
 
+</html>

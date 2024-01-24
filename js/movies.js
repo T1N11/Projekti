@@ -11,10 +11,6 @@ function resnav() {
 
 const img = document.getElementById('info-poster');
 
-
-
-
-
     const urlParams = new URLSearchParams(window.location.search);
     const videoLink = urlParams.get('video');
     console.log(videoLink);
@@ -23,8 +19,5 @@ const img = document.getElementById('info-poster');
 
     videoSource.src = videoLink;
     videoPlayer.play();
-
-
-
 
 

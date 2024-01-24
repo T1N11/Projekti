@@ -3,13 +3,14 @@
     include 'php/dbconn.php'; 
     $loggedIn = isset($_SESSION['user-email']);
 
-    if(!$loggedIn) {
+    if(!$loggedIn || !($_SESSION['user-role'] === 'admin')) {
         header('location: landing.php');
     }
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
     $MovieData = $dbconn->get_MovieData();
+    $messages = $dbconn->get_Messages();
 
     if (isset($_POST['submit'])) {
         $title =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['title']);    
@@ -19,7 +20,8 @@
         $videofile = $_FILES['videofile']['name'];
         $rating = $_POST['rating'];
         $description =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['description']);    
-        if ($dbconn->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description)) {
+        $userid = $dbconn->get_UserID($_SESSION['user-email']);
+        if ($dbconn->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $userid)) {
             header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been inserted!</h3>";
         } else {
@@ -59,16 +61,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="axes.png">
+
     <!-- <link rel="stylesheet" href="css/account.css"> -->
-    <title>Document</title>
+    <title>Dashboard</title>
 </head>
 <body>
 
     <div class="topnav" id="myTopnav">
             <a href="landing.php">MovieOrk</a>
             <a href="landing.php">Home</a>
-            <a href="movies.php" >Movies</a>
+            <a href="movies.php?page=1" >Movies</a>
             <a href="about.php" >About</a>
+            <a href="contact.php">Contact Us </a>
             <?php
                     if ($loggedIn) {
                         if ($_SESSION['user-role'] === 'admin') {
@@ -84,6 +90,8 @@
             </a>
     </div>
     <div class="dashboard">
+        <button id="message-button" onclick="openMessages()">Messages</button>
+
         <div class="section-1">
             <div class="table-con">
                 <table>
@@ -93,6 +101,7 @@
                             <th>Duration</th>
                             <th>ReleaseYear</th>
                             <th>Poster</th>
+                            <th>Added-By</th>
                             <th>Operations</th>
                         </tr>
                         <?php foreach ($MovieData as $movie): ?>
@@ -102,6 +111,7 @@
                             <td><?= $movie['duration'] ?></td>
                             <td><?= $movie['releaseyear'] ?></td>
                             <td><?= $movie['poster'] ?></td>
+                            <td><?= $movie['addedby'] ?></td>
                             <td>
                                 <div class="buttons">
                                     <button onclick="openModal(
@@ -131,8 +141,7 @@
                             <input type="number" id="edit-duration" name="duration" placeholder="Duration" required>
                             <input type="number" id="edit-releaseyear" name="releaseyear" placeholder="ReleaseYear" required>
                             <input type="float" id="edit-rating" name="rating" placeholder="Rating" required>
-                            <!-- <input type="text" id="edit-description" name="description" placeholder="Description"> -->
-                            <button name="update" id="update">Update</button>
+                            <p><button name="update" id="update">Update</button></p>
                         </form>
                     </div>
                 </div>
@@ -145,15 +154,44 @@
                         <input type="number" name="duration" placeholder="Duration" required>
                         <input type="number" name="releaseyear" placeholder="ReleaseYear" required>
                         <input type="file" accept="image/*" name="poster" placeholder="Poster" required>
-                        <input type="file" accept=".mp4" name="videofile" placeholder="Poster" >
+                        <input type="file" accept=".mp4" name="videofile" placeholder="VideoFile" >
                         <input type="float" name="rating" placeholder="Rating" required>
                         <input type="text" name="description" placeholder="Description">
                         <p><button name="submit" id="insert" >Insert</button></p>
                     </form> 
                 </div>
+
+               
         </div> 
-    </div>
         
+        
+        <div id="messages">
+
+            <div class="messages-content">
+            <span class="close" onclick="closeMessages()">&times;</span>
+
+                <table class="message-table">
+                    <tr>
+                        <td>Message ID</td>
+                        <td>Name</td>
+                        <td>Surname</td>
+                        <td>Email</td>
+                        <td>Message</td>
+                    </tr>
+                    <?php foreach ($messages as $message): ?>
+                        <tr>
+                            <td><?= $message['messageid'] ?></td>
+                            <td><?= $message['name'] ?></td>
+                            <td><?= $message['surname'] ?></td>
+                            <td><?= $message['email'] ?></td>
+                            <td><?= $message['message'] ?></td>
+
+                        </tr>
+                    <?php endforeach ?>
+                </table>
+            </div>
+    </div>
+ 
     <script src="js/movies.js"></script>
     <script src="logout.js"></script>
     <script src="js/dashboard.js"></script>
@@ -161,17 +199,56 @@
 </body>
 </html>
 
-<style>
 
+
+<style>
+    #message-button, #update {
+        width: 200px;
+        min-width: 100px;
+        font-size: 20px;    
+    }
+
+    #messages {
+        display: none;
+        position: fixed;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }      
+    .messages-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        max-width: 80vw;
+        max-height: 60vh;
+    }  
+    .message-table {
+        width: 80vw;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .message-table tr {
+
+    }
     * {
         margin: 0;
         padding: 0;
         font-family: 'Montserrat', sans-serif;
-
     }
 
     body {
-        background: #171717;
+        background: #171717;    `
     }
     table, th, td{
         border: 1px solid black;
@@ -180,29 +257,29 @@
     }
 
     .table-con {
-        max-height: 500px;
+        max-height: 60vh;
+        max-width: 60vw;
         overflow-y: auto;
+        overflow-x: auto;
         border: solid 1px black;
         border-radius: 5px;
-        display: flex;
-        justify-content: center;
+
     }
 
     table {
-
+        max-width: 100%;
         padding: 10px;
+
     }
 
     th {
-        height: 50px;
-        padding: 0 10px 0  10px;
+        padding: 5px 5px 5px 5px;
         background-color: #004898;
         color: white;
     }
 
     td {
-        height: 40px;
-        padding: 5px 5px 5px 5px;
+        max-height: 40px;
     }
     td button {
         margin: 10px 10px 10px 10px;
@@ -213,24 +290,25 @@
     }
     
     .dashboard {
-        margin-top: 30px;
+        margin: 30px auto 0px auto;
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        max-width: 100vw;
+ 
+        max-width: 90vw;
         max-height: 100vh;
+        background-color: white;
+        overflow: hidden;
     }
 
     .form {
-        width: 30vw;
-        max-width: 500px;
-        padding-bottom: 50px;
-        height: 80%;
+        max-width: 40vw;
+        max-height: 80%;
 
+    
+        display: flex;  
     }
     
-
-
     form h1 {
         margin-bottom: 20px;
     }
@@ -241,40 +319,39 @@
         border: none;
         background: #dfe9f5;
         padding: 12px 14px;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
         border-radius: 10px;
     }
+
     
     #insert {
         width: 150px;
     }
 
     .section-1 {
-        width: 100%;
-        height: 80vh;
-        background: #fff;
-        border-radius: 10px;
-        text-align: center;
         display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: start;
-
-        padding-top: 30px;
+        justify-content: space-between;
+        gap: 50px;
+        max-width: 100vw;
+        background: #fff;
+        margin: 10px 20px 100px 20px;
+        border-radius: 10px;
+        overflow-y: auto;
+        text-align: center;
     }
 
     button { 
-    font-size: 1.1rem;
-    margin-top: 1rem;
-    padding: 8px;
-    border-radius: 5px;
-    outline: none;
-    border:none;
-    width: 65%;
-    background-color: #004898;
-    color: #fff;
-    cursor: pointer;
-}   
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        padding: 10px 5px 10px 5px;
+        border-radius: 5px;
+        outline: none;
+        border:none;
+        background-color: #004898;
+        color: #fff;
+        cursor: pointer;
+        width: 70px;
+    }   
 
     button:hover {
         background: blue;
@@ -307,17 +384,6 @@
 
     .topnav .icon {
         display: none;
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        font-family: 'Montserrat', sans-serif;
-
-    }
-
-    body {
-        background: #171717;
     }
 
     .modal {
@@ -355,7 +421,6 @@
         border-radius: 10px;
     }
 
-    /* Style for the close button */
     .close {
         color: #aaa;
         float: right;
@@ -364,7 +429,7 @@
         cursor: pointer;
     }
 
-    @media screen and (max-width: 600px) {
+    @media screen and (max-width: 600px) {  
     .topnav a:not(:first-child) {
         display: none;
     }
@@ -390,8 +455,36 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        max-width: 100vw;
+        max-height: 100vh;
+        font-size: 10px;
+    }   
+    
+    .table-con {
+        max-width: 80vw;
+        max-height: 100vh
     }
-}
+    button {
+        width: 50px;
+        font-size: 10px;
+    }
+
+    form input { 
+        width: 100px;
+        font-size: 10px;
+    }
+
+    #insert {
+        width: 130px;
+        font-size: 10px;
+    }
+
+    #message-button {
+        width: 100px;
+        font-size: 10px;
+    }
+    
+    } 
 </style>
 
 

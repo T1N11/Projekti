@@ -9,7 +9,7 @@ body {
     background-color: #111;
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
 
@@ -46,14 +46,14 @@ body {
 main {
     /* display: flex; */
     margin-top: 50px;
-    height: 100%;       
+
 }
 .posters {
     background-color: #171717;
     display: flex;
     margin: 0 auto;
     max-width: 900px;
-
+    min-height: 1000px;
     justify-content: space-between;
     padding: 0 0 10px 0; 
     border-radius: 30px;
@@ -63,7 +63,7 @@ main {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    
+
 }
 
 
@@ -72,6 +72,8 @@ main {
 }
 
 .movie {
+    max-width: 250px;
+    max-height: 330px   ;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -134,17 +136,20 @@ main {
 
 .navpage-list {
     display:flex;
-    justify-content: space-between;
+    justify-content: center;
     width: 600px;
 }
 
 .ad {
     
     margin-left: 50px;
+    border-radius: 10px;
 }
 .ad2 {
     
     margin-right: 50px;
+    border-radius: 10px;
+
 }
 
 .ad, .ad2 {
@@ -173,12 +178,14 @@ main {
 footer {
     background-color: black;
     bottom: 0;
+    margin-top: 30px;
     width: 100vw;
     height: 10vh;
 }
 
 .foot {
     padding-top: 20px;
+
     color: white;
     display: flex;
     justify-content: space-around;
@@ -239,7 +246,9 @@ footer {
 }
 
 video {
-    width: 80vw;
+    min-width: 80vw;
+    max-width: 95vw;
+    border-radius: 10px;
 }     
 
 .info-container {
@@ -247,8 +256,9 @@ video {
     background-color: #171717;
     display: flex;
     justify-content: center;
-    width: 80vw;
-    margin-left:8vw;
+    min-width: 75vw;
+    max-width: 80vw;
+    margin-left: 8vw;   
     margin-bottom: 80px;
     padding: 20px;
     border-radius: 10px;
@@ -262,6 +272,13 @@ video {
 
 .info-poster img{
     border-radius: 10%;
+    max-width: 300px;
+    max-height: 400px;
+}
+
+#info-button {
+    width: 200px;
+    font-size: 10px;
 }
 
 .info {
@@ -294,7 +311,22 @@ video {
     gap: 10px;
 }
 
+button { 
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+    border:none;
+    width: 15%;
+    background-color: #004898;
+    color: #fff;
+    cursor: pointer;
+}
 
+button:hover {
+    background: blue;
+}
 
 @media screen and (max-width: 600px) {
     .topnav a:not(:first-child) {
@@ -318,6 +350,16 @@ video {
         text-align: left;
     }
 
+    .movie img {
+        width: 150px;
+        height: 200px;
+    }
+    .movie-info {
+        font-size: 10px;
+        width: 130px;
+       
+    }
+
     .foot {
         margin-top: 60px;
         padding-bottom: 20px;
@@ -334,7 +376,7 @@ video {
     }
 
     .info-sub-container{
-        width: 50vw;
+        width: 80vw;
         flex-direction: column;
         align-items: center;
     }
@@ -351,14 +393,22 @@ video {
         height: 150px;
     }
     .watch-title {
-        flex-direction: column;
+        flex-direction: row;
         justify-content: center;
     }
     .imdb {
         justify-content: center;
     }
 
+    #info-butt-container {
+        display: flex;
+        justify-content: center;
+    }
 
+    .info-poster img {
+        width: 150px;
+        height: 250px;
+    }
 }
 
 @media screen and (max-width: 1200px) {

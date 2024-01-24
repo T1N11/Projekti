@@ -1,6 +1,11 @@
 <?php
     session_Start();
+    include 'php/dbconn.php';
     $loggedIn = isset($_SESSION['user-email']);
+
+    $dbconn = new DatabaseConnection();
+    $dbconn->startConnection();
+
 ?>
 
 <!DOCTYPE html>
@@ -20,13 +25,16 @@
                 <div class="topnav" id="myTopnav"> 
                     <a href="landing.php" id="logo">MovieOrk</a>
                     <a href="landing.php" class="active">Home</a>
-                    <a href="movies.php">Movies</a>
+                    <a href="movies.php?page=1">Movies</a>
                     <a href="about.php">About</a>
-
+                    <a href="contact.php">Contact Us </a>
+                    
                     <?php
                         if ($loggedIn) {
                             if ($_SESSION['user-role'] === 'admin') {
                                 echo '<a href="dashboard.php">Dashboard</a>';
+                            }else{
+                                echo '<a href="watchlist.php">WatchList</a>';
                             }
                             echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
                         } else {
@@ -46,7 +54,7 @@
             <div class="info">
                 
                 <div>
-                    <h2>Embark in the ultimate streaming experience with Free HD access to a world of captivating narratives, stunning visuals, and unforgettable moments.</h2>
+                    <h2><?= $dbconn->load_Landing(1, 'landing') ?></h2>
                     <div class="searchbar">
                         <input type="search" placeholder="Search for a Movie....">
                         <button><i class="fa fa-search	"></i></button>

@@ -1,18 +1,24 @@
 
 <?php
     include 'php/dbconn.php';
+    include 'php/MovieController.php';
     session_start();
+
+    $_SESSION['mov-page'] = $_GET['page'];
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
+    $movieController = new MovieController($dbconn);
+
+
     // $movieData = $dbconn->get_MovieData();
-    $totalMovies = $dbconn->totalMovies();
+    $totalMovies = $movieController->totalMovies();
     $moviesPerPage = 12;
     $totalPages = ceil($totalMovies / $moviesPerPage);
     $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
     $startIndex = ($currentPage - 1) * $moviesPerPage;
-    $movieData = $dbconn->get_ByPage($startIndex, $moviesPerPage);
+    $movieData = $movieController->getByPage($startIndex, $moviesPerPage);
 
 
     $dbconn->closeConnection();
@@ -34,13 +40,16 @@
             <div class="topnav" id="myTopnav">
                 <a href="landing.php">MovieOrk</a>
                 <a href="landing.php">Home</a>
-                <a href="movies.php" class="active">Movies</a>
+                <a href="movies.php?page=1" class="active">Movies</a>
                 <a href="about.php">About</a>
+                <a href="contact.php" >Contact Us </a>
 
                  <?php
                     if ($loggedIn) {
                         if ($_SESSION['user-role'] === 'admin') {
                             echo '<a href="dashboard.php">Dashboard</a>';
+                        }else{
+                            echo '<a href="watchlist.php">WatchList</a>';
                         }
                         echo '<a href="javascript:void(0);" onclick="logout()">LogOut</a>';
                     } else {
@@ -124,7 +133,7 @@
                     <div><p style="font-size: small;">All rights reserved · UBT · 2023</p></div>
                 </div> 
                 
-            </footer>
+        </footer>
         <script src="js/movies.js"></script>
         <script src="logout.js"></script>
     </body>

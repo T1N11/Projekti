@@ -98,8 +98,8 @@ class DataBaseConnection {
         }
     }
 
-    public function insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description) {
-        $query = "INSERT INTO movies (title, duration, rating, releaseyear, poster, videofile, description) VALUES ('$title', '$duration', '$rating', '$releaseyear', '$poster', '$videofile', '$description')";
+    public function insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $addedby) {
+        $query = "INSERT INTO movies (title, duration, rating, releaseyear, poster, videofile, description, addedby) VALUES ('$title', '$duration', '$rating', '$releaseyear', '$poster', '$videofile', '$description', '$addedby')";
 
         
         if ($this->movieExists($title)) {
@@ -199,8 +199,167 @@ class DataBaseConnection {
 
         return $complete;
     }
+
+    public function add_ToWatchList($email, $movieId) {
+        $query_user = "SELECT userid FROM users WHERE email = '$email'";
+        $result_user = mysqli_query($this->conn, $query_user);
+    
+        if (!$result_user) {
+            echo "Error fetching user ID: " . mysqli_error($this->conn);
+            return false;
+        }
+    
+        $row_user = mysqli_fetch_assoc($result_user);
+        $userid = $row_user['userid'];
+    
+        $query_watchlist_count = "SELECT COUNT(*) as count FROM watchlist WHERE userid = '$userid'";
+        $result_watchlist_count = mysqli_query($this->conn, $query_watchlist_count);
+    
+        if (!$result_watchlist_count) {
+            echo "Error fetching watchlist count: " . mysqli_error($this->conn);
+            return false;
+        }
+    
+        $row_watchlist_count = mysqli_fetch_assoc($result_watchlist_count);
+        $watchlist_count = $row_watchlist_count['count'];
+    
+        if ($watchlist_count >= 12) {
+            echo "<h3 style='background-color: red; text-align:center;'>You can only add a maximum of 12 movies to your watchlist!<h3>";
+            return false;
+        }
+    
+        $query = "INSERT INTO watchlist(userid, movieid) VALUES ('$userid', '$movieId')";
+        $complete = mysqli_query($this->conn, $query);
+    
+        if (!$complete) {
+            echo "<h3 style='background-color: red; text-align:center;'>Movie Already in WatchList!<h3>";
+            return false;
+        }
+    
+        return true;
+    }
+    
+
+    public function load_WatchList($email) {
+        $query_user = "SELECT userid FROM users WHERE email = '$email'";
+        $result_user = mysqli_query($this->conn, $query_user);
+    
+        if (!$result_user) {
+            echo "Error fetching user ID: " . mysqli_error($this->conn);
+            return [];
+        }
+    
+        $row_user = mysqli_fetch_assoc($result_user);
+        $userid = $row_user['userid'];
+    
+        $query_watchlist = "SELECT m.* FROM movies m
+                            JOIN watchlist w ON m.movieid = w.movieid
+                            WHERE w.userid = '$userid'";
+        $result_watchlist = mysqli_query($this->conn, $query_watchlist);
+    
+        if (!$result_watchlist) {
+            echo "Error fetching watchlist: " . mysqli_error($this->conn);
+            return [];
+        }
+    
+        $watchlist = [];
+        while ($row_watchlist = mysqli_fetch_assoc($result_watchlist)) {
+            $watchlist[] = $row_watchlist;
+        }
+    
+        return $watchlist;
+    }
+    
+    public function in_WatchList($email, $movieID) {
+        $query_user = "SELECT userid FROM users WHERE email = '$email'";
+        $result_user = mysqli_query($this->conn, $query_user);
+        
+        if (!$result_user) {
+            echo "Error fetching user ID: " . mysqli_error($this->conn);
+            return [];
+        }
+
+        $row_user = mysqli_fetch_assoc($result_user);
+        $userid = $row_user['userid'];
+
+        $query_watchlist = "SELECT * FROM watchlist w WHERE w.userid = '$userid' and w.movieid = '$movieID'";
+        $result_watchlist = mysqli_query($this->conn, $query_watchlist);
+
+        
+        return mysqli_num_rows($result_watchlist) > 0;
+
+       
+    }
+
+    public function remove_FromWatchList($email, $movieID) {
+        $query_user = "SELECT userid FROM users WHERE email = '$email'";
+        $result_user = mysqli_query($this->conn, $query_user);
+        
+        if (!$result_user) {
+            echo "Error fetching user ID: " . mysqli_error($this->conn);
+            return [];
+        }
+
+        $row_user = mysqli_fetch_assoc($result_user);
+        $userid = $row_user['userid'];
+
+        $query_watchlist = "DELETE FROM watchlist WHERE userid = '$userid' AND movieid = '$movieID'";
+        $result = mysqli_query($this->conn, $query_watchlist);
+
+        return $result;
+    }
+
+    public function add_Message($first, $last, $email, $message) {
+        $query = "INSERT INTO messages (name, surname, email, message) VALUES ('$first', '$last','$email', '$message')";
+        $execute = mysqli_query($this->conn, $query);
+    
+        return $execute;
+    }
+
+    public function get_UserID($email) {
+        $query_user = "SELECT username FROM users WHERE email = '$email'";
+        $result = mysqli_query($this->conn, $query_user);
+        $row_user = mysqli_fetch_assoc($result);
+        $username = $row_user['username'];
+        return $username;
+    }
+
+    public function get_Messages() {
+        $query = "SELECT * FROM messages";
+        $result = mysqli_query($this->conn, $query);
+        
+        if ($result && mysqli_num_rows($result) > 0) {
+            while($row = $result->fetch_assoc()) {
+                $messages[] = $row;
+            }
+        }
+        return $messages;
+    }
+
+    public function load_Landing($dataid, $tableName) {
+        $query = "SELECT * FROM $tableName WHERE dataid = ?";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param('i', $dataid); 
+        $stmt->execute();
+        
+
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $data = $row['data'];
+        } else {
+
+            $data = "Default landing page data";
+        }
+        $stmt->close();
+        
+        return $data;
+    }
+    
     public function closeConnection() {
         mysqli_close($this->conn);
+        
     }
 }
 
