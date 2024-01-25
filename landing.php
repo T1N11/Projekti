@@ -1,10 +1,21 @@
 <?php
     session_Start();
     include 'php/dbconn.php';
+    include 'php/MovieController.php';
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DatabaseConnection();
     $dbconn->startConnection();
+
+    $MC = new MovieController($dbconn);
+
+
+
+    if(isset($_POST['search'])) {
+
+        $search_text = $_POST['text'];
+        header("Location: search.php?search=" . $search_text);
+    }
 
 ?>
 
@@ -56,8 +67,11 @@
                 <div>
                     <h2><?= $dbconn->load_Landing(1, 'landing') ?></h2>
                     <div class="searchbar">
-                        <input type="search" placeholder="Search for a Movie....">
-                        <button><i class="fa fa-search	"></i></button>
+                        <form action="" method="post">
+                            <input type="search" name='text'     placeholder="Search for a Movie....">
+                            <button name="search"><i class="fa fa-search	"></i></button>
+                        </form>
+
                     </div>
                 </div>
             </div>

@@ -11,6 +11,9 @@
     $dbconn->startConnection();
     $MovieData = $dbconn->get_MovieData();
     $messages = $dbconn->get_Messages();
+    $userid = $dbconn->get_UserID($_SESSION['user-email']);
+    $users = $dbconn->get_Users();
+
 
     if (isset($_POST['submit'])) {
         $title =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['title']);    
@@ -20,7 +23,6 @@
         $videofile = $_FILES['videofile']['name'];
         $rating = $_POST['rating'];
         $description =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['description']);    
-        $userid = $dbconn->get_UserID($_SESSION['user-email']);
         if ($dbconn->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $userid)) {
             header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been inserted!</h3>";
@@ -34,9 +36,10 @@
         $title = mysqli_real_escape_string($dbconn->getConnection(), $_POST['title']);
         $duration = $_POST['duration'];
         $releaseyear = $_POST['releaseyear'];
+        $rating = $_POST['rating'];
     
-        if ($dbconn->updateMovie($movieid, $title, $duration, $releaseyear)) {
-            header('Location: dashboard.php');
+        if ($dbconn->updateMovie($movieid, $title, $duration, $releaseyear, $rating, $userid)) {
+            // header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been updated!</h3>";
         } else {
             echo "<h3 style='background-color: red; text-align: center;'>Failed to update the movie!</h3>";
@@ -50,6 +53,14 @@
             header('Location: dashboard.php');
         } else {
             echo "<h3 style='background-color: red; text-align: center;'>Failed to delete the movie!</h3>";
+        }
+    }
+
+    if (isset($_POST['delete-user'])) {
+        $userid = $_POST['userid'];
+
+        if($dbconn->delete_User($userid)) {
+            header('Location: dashboard.php');
         }
     }
 
@@ -90,7 +101,10 @@
             </a>
     </div>
     <div class="dashboard">
-        <button id="message-button" onclick="openMessages()">Messages</button>
+        <div>
+            <button id="message-button" onclick="openMessages()">Messages</button>
+            <button id="message-button" onclick="openUsers()">Users</button>
+        </div>
 
         <div class="section-1">
             <div class="table-con">
@@ -190,7 +204,42 @@
                     <?php endforeach ?>
                 </table>
             </div>
+        </div>
+        
+        <div id="users">
+
+
+            <div class="messages-content">
+                <span class="close" onclick="closeUsers()">&times;</span>
+
+                    <table class="message-table">
+                         <tr>
+                            <td>UserID</td>
+                            <td>UserName</td>
+                            <td>Email</td>
+                            <td>AccountType</td>
+                        </tr>
+                        <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= $user['userid'] ?></td>
+                                <td><?= $user['username'] ?></td>
+                                <td><?= $user['email'] ?></td>
+                                <td><?= $user['accountType'] ?></td>
+                                <td>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="userid" value="<?= $user['userid'] ?>">
+                                            <button type="submit" name="delete-user" style="background-color: red;">Delete</button>
+                                        </form>
+                                    </td>
+
+                                </tr>
+                            <?php endforeach ?>
+                        </table>
+            </div>
+         </div>
+            
     </div>
+
  
     <script src="js/movies.js"></script>
     <script src="logout.js"></script>
@@ -202,6 +251,9 @@
 
 
 <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
     #message-button, #update {
         width: 200px;
         min-width: 100px;
@@ -218,7 +270,20 @@
         width: 100%;
         height: 100%;
         background-color: rgba(0,0,0,0.5);
-    }      
+    }
+    
+    #users {
+        display: none;
+        position: fixed;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
     .messages-content {
         display: flex;
         flex-direction: column;
@@ -233,14 +298,13 @@
         max-height: 60vh;
     }  
     .message-table {
-        width: 80vw;
+        
         text-align: center;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: auto;
     }
 
-    .message-table tr {
 
-    }
     * {
         margin: 0;
         padding: 0;
@@ -267,7 +331,7 @@
     }
 
     table {
-        max-width: 100%;
+        max-width: 100vw;
         padding: 10px;
 
     }
@@ -429,7 +493,7 @@
         cursor: pointer;
     }
 
-    @media screen and (max-width: 600px) {  
+    @media screen and (max-width: 800px) {  
     .topnav a:not(:first-child) {
         display: none;
     }
@@ -482,6 +546,13 @@
     #message-button {
         width: 100px;
         font-size: 10px;
+    }
+
+    .message-table {
+        display: inherit;
+        max-width: 80vw;
+        overflow-x: auto;
+        overflow-y: auto;
     }
     
     } 

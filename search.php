@@ -7,16 +7,31 @@
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
-    $movieController = new MovieController($dbconn);
+    $MC = new MovieController($dbconn);
 
+    $search_text = isset($_GET['search']) ? $_GET['search'] : null;
+
+    $searchResults = $MC->search($search_text);
+
+        // print_r($searchResults);
+    $moviesData = [];
+    $count = 0;
+    
+    foreach ($searchResults as $movieId) {
+            $movieData = $MC->getMovieByID($movieId['movieid']);
+        if ($movieData) {
+            $count = $count + 1;
+            $moviesData[] = $movieData;
+        }
+    }
 
     // $movieData = $dbconn->get_MovieData();
-    // $totalMovies = $movieController->totalMovies();
-    // $moviesPerPage = 12;
-    // $totalPages = ceil($totalMovies / $moviesPerPage);
-    // $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
-    // $startIndex = ($currentPage - 1) * $moviesPerPage;
-    // $movieData = $movieController->getByPage($startIndex, $moviesPerPage);
+    $totalMovies = $count;
+    $moviesPerPage = 12;
+    $totalPages = ceil($totalMovies / $moviesPerPage);
+    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+    $startIndex = ($currentPage - 1) * $moviesPerPage;
+    $movieData = $moviesData;
 
 
     $dbconn->closeConnection();

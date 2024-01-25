@@ -71,8 +71,9 @@
             <div id='error-message' style='color: red;'></div>
             <input type="text" name="first" id="username" placeholder="Enter your First Name" required>
             <input type="text" name="last" id="username" placeholder="Enter your Last Name" required>
-            <input type="email" name="email" id="email" placeholder="Enter your email..." required>            <h3>Message!</h3>
-            <p><textarea id="message" name="message" rows="8" cols="50" required></textarea><p>   
+            <input type="email" name="email" id="email" placeholder="Enter your email..." required>            
+            <h3>Message!</h3>
+            <p><textarea style="width: 50%" id="message" name="message" rows="8" cols="50" required></textarea><p>   
             <button name="submit" onclick="validateReg()" >Submit Form</button>
         </form>
     </div>

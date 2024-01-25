@@ -52,6 +52,7 @@ main {
     background-color: #171717;
     display: flex;
     margin: 0 auto;
+    /* min-width: 800px; */
     max-width: 900px;
     min-height: 1000px;
     justify-content: space-between;
@@ -73,7 +74,7 @@ main {
 
 .movie {
     max-width: 250px;
-    max-height: 330px   ;
+    max-height: 350px   ;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -328,7 +329,7 @@ button:hover {
     background: blue;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px ) {
     .topnav a:not(:first-child) {
         display: none;
     }

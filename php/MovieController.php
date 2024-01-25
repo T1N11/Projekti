@@ -19,8 +19,8 @@ class MovieController {
         return $this->dbconn->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description);
     }
 
-    public function updateMovie($movieid, $title, $duration, $releaseyear) {
-        return $this->dbconn->updateMovie($movieid, $title, $duration, $releaseyear);
+    public function updateMovie($movieid, $title, $duration, $releaseyear, $userid) {
+        return $this->dbconn->updateMovie($movieid, $title, $duration, $releaseyear, $userid);
     }
 
     public function deleteMovie($movieid) { 
@@ -46,5 +46,36 @@ class MovieController {
         return $this->dbconn->remove_FromWatchList($email, $movieID);
 
     }
+
+    public function search($text) {
+        $database = $this->dbconn->getConnection();
+        $query = "SELECT movieid FROM movies WHERE title LIKE ?";
+        $text = urldecode($text);
+        $stmt = $database->prepare($query);
+        if (!$stmt) {
+            die('Error in query preparation: ' . $database->error);
+        }
+    
+        $text = '%' . $text . '%'; 
+        $stmt->bind_param('s', $text);
+        
+        $success = $stmt->execute();
+        if (!$success) {
+            die('Error in query execution: ' . $stmt->error);
+        }
+    
+        $result = $stmt->get_result();
+        
+        $hits = [];
+        
+        while ($row_result = $result->fetch_assoc()) {
+            $hits[] = $row_result;
+        }
+        
+        $stmt->close();
+        
+        return $hits;
+    }
+    
 }
 ?>
