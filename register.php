@@ -1,6 +1,8 @@
 <?php
     session_start();
     include 'php/dbconn.php';
+    include 'php/UserController.php'
+;
 
     $loggedIn = isset($_SESSION['user-email']);
     if($loggedIn) {
@@ -13,15 +15,18 @@
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirmPassword'];
 
-        $dbconnect = new DataBaseConnection();
-        $conn = $dbconnect->startConnection();
+        $dbconn = new DataBaseConnection();
+        $dbconn->startConnection();
+        $database = $dbconn->getConnection();
+        $userController = new UserController($database);
 
-        if ($dbconnect->insertData($username, $email, $password, $confirmPassword)) {
+
+        if ($userController->insertUser($username, $email, $password, $confirmPassword)) {
             header("Location: account.php");
             exit();
         };
 
-        $dbconnect->closeConnection();
+        $dbconn->closeConnection();
     }
 ?>
 
@@ -55,14 +60,13 @@
         <h1>MovieOrk</h1>
         <p>Would you like to become a member<br> of the ORK?</p>
 
-        <form action="" method="post" onsubmit="return validateReg();">
+        <form action="" method="post" >
             <div id='error-message' style='color: red;'></div>
             <input type="text" name="username" id="username" placeholder="Enter your name" required>
             <input type="email" name="email" id="email" placeholder="Enter your email..." required>
             <input type="password" name="password" id="password" placeholder="Password" required>
             <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
             <button name="submit" onclick="validateReg()" >Register</button>
-            <!-- onclick='validateReg();' -->
             <div class="Already signed in?">
                 Already signed in? <a href="account.php">Log in</a>
             </div>

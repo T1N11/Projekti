@@ -46,13 +46,12 @@ body {
 main {
     /* display: flex; */
     margin-top: 50px;
-
 }
 .posters {
     background-color: #171717;
     display: flex;
     margin: 0 auto;
-    /* min-width: 800px; */
+    min-width: 800px;
     max-width: 900px;
     min-height: 1000px;
     justify-content: space-between;
@@ -409,6 +408,11 @@ button:hover {
     .info-poster img {
         width: 150px;
         height: 250px;
+    }
+
+    .posters { 
+        max-width: 500px;
+        min-width: 0px;
     }
 }
 

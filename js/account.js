@@ -12,7 +12,7 @@ function validateReg() {
     var password = document.getElementById('password').value;
     var confirmPassword = document.getElementById('confirmPassword').value;
 
-    var nameRegex = /^[a-zA-z\s]+$/;
+    var nameRegex = /^[a-zA-Z0-9\s]+$/;
     var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
 
     var errorMessage = "";
@@ -23,7 +23,6 @@ function validateReg() {
 
     if(!emailRegex.test(email)) {
         errorMessage += 'Please enter a valid email!\n';
-        
     }
 
     if(password.length < 6) {
@@ -45,10 +44,17 @@ function validateReg() {
 function validateLog() {
     var email = document.getElementById('email').value;
 
+    var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,3}$/;
 
-    var emailRegex = /^[a-zA-z.-_]+@+[a-z]+\.+[a-z]{2,3}$/;
-    if(!emailRegex.test(email)) {
-        alert("Please enter a valid email address!");
+    var errorMessage = "";
+
+    if (!emailRegex.test(email)) {
+        errorMessage += 'Please enter a valid email!\n';
+        document.getElementById('error-message').innerText = errorMessage;
+        return false;
     }
+
+    document.getElementById('error-message').innerText = "";
+    return true;
 }
 

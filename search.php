@@ -1,41 +1,31 @@
 
 <?php
+    session_start();
     include 'php/dbconn.php';
     include 'php/MovieController.php';
-    session_start();
+
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
-    $MC = new MovieController($dbconn);
+    $database = $dbconn->getConnection();
+    $movieController = new MovieController($database);
+
+    $moviesData = [];
 
     $search_text = isset($_GET['search']) ? $_GET['search'] : null;
 
-    $searchResults = $MC->search($search_text);
+    $searchResults = $movieController->search($search_text);
 
-        // print_r($searchResults);
-    $moviesData = [];
-    $count = 0;
-    
-    foreach ($searchResults as $movieId) {
-            $movieData = $MC->getMovieByID($movieId['movieid']);
+    foreach ($searchResults as $result) {
+        $movieData = $movieController->getMovieByID($result['movieid']);
         if ($movieData) {
-            $count = $count + 1;
             $moviesData[] = $movieData;
         }
     }
 
-    // $movieData = $dbconn->get_MovieData();
-    $totalMovies = $count;
-    $moviesPerPage = 12;
-    $totalPages = ceil($totalMovies / $moviesPerPage);
-    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
-    $startIndex = ($currentPage - 1) * $moviesPerPage;
-    $movieData = $moviesData;
-
 
     $dbconn->closeConnection();
-
 ?>
 
 <!DOCTYPE html>
@@ -53,10 +43,12 @@
             <div class="topnav" id="myTopnav">
                 <a href="landing.php">MovieOrk</a>
                 <a href="landing.php">Home</a>
-                <a href="movies.php?page=1" class="active">Movies</a>
+                <a href="movies.php?page=1">Movies</a>
                 <a href="about.php">About</a>
+                <a href="contact.php" >Contact Us </a>
 
-                 <?php
+
+                <?php
                     if ($loggedIn) {
                         if ($_SESSION['user-role'] === 'admin') {
                             echo '<a href="dashboard.php">Dashboard</a>';
@@ -75,46 +67,32 @@
                 </a>
             </div>
         </header>
-
+        
+        <?php if (!empty($moviesData)) { ?>
         <main>
-            <section class="full">
             
+            <section class="full">
                 <div class="posters">
                     <div class="movies">
-                        <?php foreach ($movieData as $movie): {
-                                $movieUrl = 'watch.php?video=mp4/' . $movie['videofile'] . '&id=' . $movie['movieid'];
-                        }?>
+                        <?php foreach ($moviesData as $movie): 
+                            $movieUrl = 'watch.php?video=mp4/' . $movie->getVideoFile() . '&id=' . $movie->getMovieId();
+                        ?>
                             <div class="movie">
                                 <a href=<?= $movieUrl ?>>
-                                    <img src="posters/<?= $movie['poster'] ?>" alt="">
+                                    <img src="posters/<?= $movie->getPoster() ?>" alt="">
                                 </a>
                                 <div class="movie-info">
-                                    <a href="watch.php?video=mp4/<?= $movie['videofile'] ?>">
-                                        <h3><?= $movie['title'] ?></h3>
-                                        <p><?= $movie['releaseyear'] ?> · <?= $movie['duration'] ?>min</p>
+                                    <a href="watch.php?video=mp4/<?= $movie->getVideoFile() ?>">
+                                        <h3><?= $movie->getTitle(); ?></h3>
+                                        <p><?= $movie->getRating() ?> · <?= $movie->getDuration() ?>min</p>
                                     </a>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
-
             </section>
-
--             <div class="navpage">
-                <ul class="navpage-list">
-                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                        <li>
-                            <a href="?page=<?= $i ?>" <?= ($i == $currentPage) ? 'class="active"' : '' ?>>
-                                <?= $i ?>
-                            </a>
-                        </li>
-                    <?php endfor; ?>
-                </ul>
-            </div>
-
             
-
          
         </main>
                         
@@ -140,9 +118,20 @@
                 </div> 
                 
             </footer>
+
+        <?php } else {
+                        echo '<h1 id="warning">No Such Movie Could be Found!!!<h1>';
+                    }
+        ?>
         <script src="js/movies.js"></script>
         <script src="logout.js"></script>
     </body>
 </html>
 
-
+<style> 
+    #warning {
+        margin-top: 20vw    ;
+        text-align: center;
+        color: white;
+    }
+</style>

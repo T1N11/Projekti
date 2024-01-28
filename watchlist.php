@@ -3,14 +3,14 @@
    include 'php/dbconn.php';
    include 'php/MovieController.php';
 
-   $dbconn = new DatabaseConnection();
+   $dbconn = new DataBaseConnection();
    $dbconn->startConnection();
+   $database = $dbconn->startConnection();
+   $movieController = new MovieController($database);
 
    
    $loggedIn = isset($_SESSION['user-email']);
    
-
-   $movieController = new MovieController($dbconn);
    $userWatchlist = $loggedIn ? $movieController->loadWatchList($_SESSION['user-email']) : [];
 
    if (isset($_GET['added'])) {
@@ -19,7 +19,7 @@
         if($added > 0) {
             echo "<h3 style='background-color: green;text-align:center;'>The movie has been added to your watchlist!</h3>";
         } else {
-            echo "<h3 style='background-color: red;text-align:center;'>The movie has been removed from your watchlist!</h3>";
+            echo "<h3 style='background-color: green;text-align:center;'>The movie has been removed from your watchlist!</h3>";
         }
     } 
 
@@ -45,7 +45,7 @@
         <a href="landing.php">Home</a>
         <a href="movies.php?page=1" >Movies</a>
         <a href="about.php" >About</a>
-        <a href="contact.php" class="active">Contact Us </a>
+        <a href="contact.php">Contact Us </a>
         <?php
             if ($loggedIn) {
                         if ($_SESSION['user-role'] === 'admin') {

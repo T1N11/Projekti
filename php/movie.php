@@ -2,37 +2,40 @@
 
 class Movie {
     private $movieID;
-    private $username;
-    private $email;
+    private $title;
     private $duration;
     private $releaseYear;
     private $poster;
     private $videoFile;
     private $rating;
     private $description;
+    private $addedby;
 
-    public function __construct($mi, $un, $e, $d, $ry, $p, $vf, $r, $desc) {
-        $this->movieID = $mi;
-        $this->username = $un;
-        $this->email = $e;
-        $this->duration = $d;
-        $this->releaseYear = $ry;
-        $this->poster = $p;
-        $this->videoFile = $vf;
-        $this->rating = $r;
-        $this->description = $desc;
+    public function __construct($movieID, $title, $duration, $releaseYear, $poster, $videoFile, $rating, $description, $addedby) {
+        $this->movieID = $movieID;
+        $this->title = $title;
+        $this->duration = $duration;
+        $this->releaseYear = $releaseYear;
+        $this->poster = $poster;
+        $this->videoFile = $videoFile;
+        $this->rating = $rating;
+        $this->description = $description;
+        $this->addedby = $addedby;
     }
-
     public function getMovieID() {
         return $this->movieID;
     }
+    
 
     public function setMovieID($movieID) {
         $this->movieID = $movieID;
     }
 
-    public function getUsername() {
-        return $this->username;
+    public function getTitle() {
+        return $this->title;
+    }
+    public function setTitle($title) {
+        $this->title = $title;
     }
 
     public function setUsername($username) {
@@ -93,6 +96,13 @@ class Movie {
 
     public function setDescription($description) {
         $this->description = $description;
+    }
+
+    public function getAddedBy() {
+        return $this->addedby;
+    }
+    public function set_AddedBy($addedby) {
+        $this->addedby = $addedby;
     }
 }
 

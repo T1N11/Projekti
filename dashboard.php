@@ -1,6 +1,9 @@
 <?php
     session_start();
     include 'php/dbconn.php'; 
+    include 'php/MovieController.php';
+    include 'php/UserController.php';
+
     $loggedIn = isset($_SESSION['user-email']);
 
     if(!$loggedIn || !($_SESSION['user-role'] === 'admin')) {
@@ -9,10 +12,15 @@
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
-    $MovieData = $dbconn->get_MovieData();
+    $database = $dbconn->getConnection();
+    $movieController = new MovieController($database);
+    $userController = new UserController($database);
+
+    $MovieData  = $movieController->getMovies();
     $messages = $dbconn->get_Messages();
-    $userid = $dbconn->get_UserID($_SESSION['user-email']);
-    $users = $dbconn->get_Users();
+    $username = $userController->getUsername($_SESSION['user-email']);
+    $users = $userController->getUsers();
+    $usersOnly = $userController->UsersOnly();
 
 
     if (isset($_POST['submit'])) {
@@ -23,7 +31,7 @@
         $videofile = $_FILES['videofile']['name'];
         $rating = $_POST['rating'];
         $description =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['description']);    
-        if ($dbconn->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $userid)) {
+        if ($movieController->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $userid)) {
             header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been inserted!</h3>";
         } else {
@@ -32,14 +40,14 @@
     }
 
     if (isset($_POST['update'])) {
-        $movieid = mysqli_real_escape_string($dbconn->getConnection(), $_POST['movieid']);
-        $title = mysqli_real_escape_string($dbconn->getConnection(), $_POST['title']);
+        $movieid = mysqli_real_escape_string($database, $_POST['movieid']);
+        $title = mysqli_real_escape_string($database, $_POST['title']);
         $duration = $_POST['duration'];
         $releaseyear = $_POST['releaseyear'];
         $rating = $_POST['rating'];
     
-        if ($dbconn->updateMovie($movieid, $title, $duration, $releaseyear, $rating, $userid)) {
-            // header('Location: dashboard.php');
+        if ($movieController->updateMovie($movieid, $title, $duration, $releaseyear, $rating, $userid)) {
+            header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been updated!</h3>";
         } else {
             echo "<h3 style='background-color: red; text-align: center;'>Failed to update the movie!</h3>";
@@ -49,7 +57,7 @@
     if (isset($_POST['delete'])) {
         $movieid = mysqli_real_escape_string($dbconn->getConnection(), $_POST['movieid']);
 
-        if($dbconn->deleteMovie($movieid)) {
+        if($movieController->deleteMovie($movieid)) {
             header('Location: dashboard.php');
         } else {
             echo "<h3 style='background-color: red; text-align: center;'>Failed to delete the movie!</h3>";
@@ -59,7 +67,7 @@
     if (isset($_POST['delete-user'])) {
         $userid = $_POST['userid'];
 
-        if($dbconn->delete_User($userid)) {
+        if($userController->deleteUser($userid)) {
             header('Location: dashboard.php');
         }
     }
@@ -75,7 +83,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon" href="axes.png">
 
-    <!-- <link rel="stylesheet" href="css/account.css"> -->
     <title>Dashboard</title>
 </head>
 <body>
@@ -120,22 +127,22 @@
                         </tr>
                         <?php foreach ($MovieData as $movie): ?>
                             <tr>
-                            <td><?= $movie['movieid'] ?></td>
-                            <td><?= $movie['title'] ?></td>
-                            <td><?= $movie['duration'] ?></td>
-                            <td><?= $movie['releaseyear'] ?></td>
-                            <td><?= $movie['poster'] ?></td>
-                            <td><?= $movie['addedby'] ?></td>
+                            <td><?= $movie->getMovieID() ?></td>
+                            <td><?= $movie->getTitle() ?></td>
+                            <td><?= $movie->getDuration() ?></td>
+                            <td><?= $movie->getReleaseYear() ?></td>
+                            <td><?= $movie->getPoster()?></td>
+                            <td><?= $movie->getAddedBy()?></td>
                             <td>
                                 <div class="buttons">
                                     <button onclick="openModal(
-                                        '<?= $movie['movieid'] ?>',
-                                        '<?= $movie['title'] ?>',
-                                        '<?= $movie['duration'] ?>',
-                                        '<?= $movie['releaseyear'] ?>',
-                                        '<?= $movie['rating'] ?>')">edit</button>                                
+                                        '<?= $movie->getMovieID() ?>',
+                                        '<?= $movie->getTitle() ?>',
+                                        '<?= $movie->getDuration()?>',
+                                        '<?= $movie->getReleaseYear() ?>',
+                                        '<?= $movie->getRating()?>')">edit</button>                                
                                         <form action="" method="post">
-                                            <input type="hidden" name="movieid" value="<?= $movie['movieid'] ?>">
+                                            <input type="hidden" name="movieid" value="<?= $movie->getMovieID()?>">
                                             <button type="submit" name="delete" style="background-color: red;">Delete</button>
                                         </form>
                                 </div>
@@ -194,7 +201,7 @@
                     </tr>
                     <?php foreach ($messages as $message): ?>
                         <tr>
-                            <td><?= $message['messageid'] ?></td>
+                            <td><?= $message['messageid']    ?></td>
                             <td><?= $message['name'] ?></td>
                             <td><?= $message['surname'] ?></td>
                             <td><?= $message['email'] ?></td>
@@ -219,15 +226,16 @@
                             <td>Email</td>
                             <td>AccountType</td>
                         </tr>
-                        <?php foreach ($users as $user): ?>
+                        <?php 
+                            foreach ($usersOnly as $user): ?>
                             <tr>
-                                <td><?= $user['userid'] ?></td>
-                                <td><?= $user['username'] ?></td>
-                                <td><?= $user['email'] ?></td>
-                                <td><?= $user['accountType'] ?></td>
+                                <td><?= $user->getUserID()?></td>
+                                <td><?= $user->getUsername()?></td>
+                                <td><?= $user->getEmail()?></td>
+                                <td><?= $user->getAccountType()?></td>
                                 <td>
                                         <form action="" method="post">
-                                            <input type="hidden" name="userid" value="<?= $user['userid'] ?>">
+                                            <input type="hidden" name="userid" value="<?= $user->getUserID() ?>">
                                             <button type="submit" name="delete-user" style="background-color: red;">Delete</button>
                                         </form>
                                     </td>

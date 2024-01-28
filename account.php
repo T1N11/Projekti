@@ -2,7 +2,10 @@
 <?php
     session_start();
     include 'php/dbconn.php';
-    include 'php/user.php';
+    include 'php/userController.php';
+
+
+        
 
     $loggedIn = isset($_SESSION['user-email']);
     if($loggedIn) {
@@ -12,23 +15,31 @@
         $email = $_POST['email'];
         $password = $_POST['password'];
 
-        $dbconn = new DataBaseConnection();
-        $conn = $dbconn->startConnection();
 
-        $authenticated = $dbconn->authenticateUser($email, $password);
+
+        $dbconn = new DataBaseConnection();
+        $dbconn->startConnection();
+        $database = $dbconn->getConnection();
+        $userController = new UserController($database);
+    
+        $users = $userController->getUsers();
+    
+        $authenticated = $userController->authenticateUser($email, $password);
+
 
         if ($authenticated) {
-            $role = $dbconn->is_Admin($email);
+            $role = $userController->is_Admin($email);
             $_SESSION['user-role'] = $role;
             $_SESSION['user-email'] = $email;
             if ($role === 'admin') {
                 header('Location: dashboard.php');
             } else {
-                header('Location: movies.php');
+                header('Location: movies.php?page=1');
             }
             exit();
         }else {
             echo"<h3 style='color: white; background-color: red; text-align: center; '>The Email or password is wrong!!!!<h3>";
+
         }
 
         $dbconn->closeConnection();
@@ -62,10 +73,11 @@
             <h1>MovieOrk</h1>
             <p>Would you like to, <br>log in!</p>
     
-            <form action="" method="post" onsubmit="return validateLog();">
-                <input type="email" name="email" placeholder="Enter your email..." required>
+            <form action="" method="post">
+                <div id='error-message' style='color: red;'></div>
+                <input type="email" name="email" id="email" placeholder="Enter your email..." required>
                 <input type="password" name="password" placeholder="Password" required>
-                <button name="submit" >Sign In</button>
+                <button name="submit" onclick="validateLog()" >Sign In</button>
     
                 <div class="not-member">
                     Not a member? <a href="register.php">Register Now</a>

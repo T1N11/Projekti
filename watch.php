@@ -6,13 +6,14 @@
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
-    $movieController = new MovieController($dbconn);
+    $database = $dbconn->startConnection();
+    $movieController = new MovieController($database);
 
     $movieId = isset($_GET['id']) ? $_GET['id'] : null;
 
     if ($movieId !== null) {
         $movieDetails = $movieController->getMovieByID($movieId);
-
+        // print_r($movieDetails);
         if ($movieDetails !== null) {
             $_SESSION['current_movie'] = $movieDetails;
         }
@@ -81,22 +82,22 @@
     <div class="info-container">
         <div class="info-sub-container">
             <div class="info-poster">
-                <img id='info-poster' src="posters/<?= $movieDetails['poster'] ?>" alt="">
+                <img id='info-poster' src="posters/<?= $movieDetails->getPoster() ?>" alt="">
             </div>
             <div class="info">
                 <div class="watch-title">
                     <h2>Title:</h2>
-                    <h2 id="title"><?= $movieDetails['title'] ?></h2>
+                    <h2 id="title"><?= $movieDetails->getTitle() ?></h2>
                 </div>
                 <div class="imdb">
                     <h4>IMDB: </h4>
                     <h4 id="rating"></h4>
-                    <i class="fa fa-star-half-full"><?= $movieDetails['rating'] ?></i>
+                    <i class="fa fa-star-half-full"><?= $movieDetails->getRating()?></i>
                 </div>
 
                 <div class="description-container">
                     <p><b>Description: </b></p>
-                    <p id="desc"><?= $movieDetails['description'] ?></p>     
+                    <p id="desc"><?= $movieDetails->getDescription()?></p>     
                 </div>
                 
                 <div class="info-but-container">

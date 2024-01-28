@@ -1,28 +1,30 @@
 
 <?php
+    session_start();
     include 'php/dbconn.php';
     include 'php/MovieController.php';
-    session_start();
 
     $_SESSION['mov-page'] = $_GET['page'];
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DataBaseConnection();
     $dbconn->startConnection();
-    $movieController = new MovieController($dbconn);
+    $database = $dbconn->getConnection();
+    $movieController = new MovieController($database);
+
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $moviesPerPage = 12; 
+    $totalPages = ceil($movieController->totalMovies()/$moviesPerPage);
 
 
-    // $movieData = $dbconn->get_MovieData();
-    $totalMovies = $movieController->totalMovies();
-    $moviesPerPage = 12;
-    $totalPages = ceil($totalMovies / $moviesPerPage);
-    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+
     $startIndex = ($currentPage - 1) * $moviesPerPage;
+
     $movieData = $movieController->getByPage($startIndex, $moviesPerPage);
 
+    // print_r($movieData);
 
     $dbconn->closeConnection();
-
 ?>
 
 <!DOCTYPE html>
@@ -73,16 +75,16 @@
                 <div class="posters">
                     <div class="movies">
                         <?php foreach ($movieData as $movie): {
-                                $movieUrl = 'watch.php?video=mp4/' . $movie['videofile'] . '&id=' . $movie['movieid'];
-                        }?>
+                            $movieUrl = 'watch.php?video=mp4/' . $movie->getVideoFile() . '&id=' . $movie->getMovieId();
+                            } ?>
                             <div class="movie">
                                 <a href=<?= $movieUrl ?>>
-                                    <img src="posters/<?= $movie['poster'] ?>" alt="">
+                                    <img src="posters/<?= $movie->getPoster() ?>" alt="">
                                 </a>
                                 <div class="movie-info">
-                                    <a href="watch.php?video=mp4/<?= $movie['videofile'] ?>">
-                                        <h3><?= $movie['title'] ?></h3>
-                                        <p><?= $movie['releaseyear'] ?> · <?= $movie['duration'] ?>min</p>
+                                    <a href="watch.php?video=mp4/<?= $movie->getVideoFile() ?>">
+                                        <h3><?= $movie->getTitle(); ?></h3>
+                                        <p><?= $movie->getRating()?> · <?= $movie->getDuration() ?>min</p>
                                     </a>
                                 </div>
                             </div>
@@ -95,14 +97,14 @@
                 </div>
             </section>
 
--             <div class="navpage">
+-            <div class="navpage">
                 <ul class="navpage-list">
                     <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                         <li>
                             <a href="?page=<?= $i ?>" <?= ($i == $currentPage) ? 'class="active"' : '' ?>>
-                                <?= $i ?>
-                            </a>
-                        </li>
+                                    <?= $i ?>
+                                </a>
+                            </li>
                     <?php endfor; ?>
                 </ul>
             </div>
