@@ -31,7 +31,7 @@
         $videofile = $_FILES['videofile']['name'];
         $rating = $_POST['rating'];
         $description =  mysqli_real_escape_string($dbconn->getConnection(), $_POST['description']);    
-        if ($movieController->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $userid)) {
+        if ($movieController->insertMovie($title, $duration, $rating, $releaseyear, $poster, $videofile, $description, $username)) {
             header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been inserted!</h3>";
         } else {
@@ -46,7 +46,7 @@
         $releaseyear = $_POST['releaseyear'];
         $rating = $_POST['rating'];
     
-        if ($movieController->updateMovie($movieid, $title, $duration, $releaseyear, $rating, $userid)) {
+        if ($movieController->updateMovie($movieid, $title, $duration, $releaseyear, $rating, $username)) {
             header('Location: dashboard.php');
             echo "<h3 style='background-color: green; text-align: center;'>The Movie has been updated!</h3>";
         } else {
@@ -198,6 +198,7 @@
                         <td>Surname</td>
                         <td>Email</td>
                         <td>Message</td>
+                        <td>Operations</td>
                     </tr>
                     <?php foreach ($messages as $message): ?>
                         <tr>
@@ -205,11 +206,19 @@
                             <td><?= $message['name'] ?></td>
                             <td><?= $message['surname'] ?></td>
                             <td><?= $message['email'] ?></td>
-                            <td><?= $message['message'] ?></td>
-
+                            <td id="message-box"><?= $message['message'] ?></td>
+                            <td onclick='openMessage(<?= json_encode($message["message"], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS) ?>);'><button id="read-button">Read</button></td>
                         </tr>
                     <?php endforeach ?>
                 </table>
+                
+            </div>
+        </div>
+
+        <div id="messageModal" class="modal"    >
+            <div class="messages-content" style="max-width: 800px;">
+                <span class="close" onclick="closeMessageModal()">&times;</span>
+                <p id="messageContent" style="max-width: 80vw;"></p>
             </div>
         </div>
         
@@ -225,6 +234,7 @@
                             <td>UserName</td>
                             <td>Email</td>
                             <td>AccountType</td>
+                            <td>Operations</td>
                         </tr>
                         <?php 
                             foreach ($usersOnly as $user): ?>
@@ -248,10 +258,9 @@
             
     </div>
 
- 
+    <script src="js/dashboard.js"></script> 
     <script src="js/movies.js"></script>
     <script src="logout.js"></script>
-    <script src="js/dashboard.js"></script>
 
 </body>
 </html>
@@ -259,28 +268,33 @@
 
 
 <style>
-
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+        background: #171717;
+    }
 
     #message-button, #update {
         width: 200px;
         min-width: 100px;
-        font-size: 20px;    
+        font-size: 20px;
     }
 
-    #messages {
-        display: none;
-        position: fixed;
-        justify-content: center;
-        align-items: center;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
+    #messageContent {
+        font-size: 14px;
     }
-    
-    #users {
+
+    #read-button {
+        max-width: 100px;
+    }
+
+    #messageModal, #messages, #users {
         display: none;
         position: fixed;
         justify-content: center;
@@ -289,7 +303,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
     .messages-content {
@@ -304,28 +318,20 @@
         border: 1px solid #888;
         max-width: 80vw;
         max-height: 60vh;
-    }  
+        overflow: hidden;
+    }
+
     .message-table {
-        
+        display: inherit;
         text-align: center;
-        overflow-y: auto;
+        max-width: 80vw;
         overflow-x: auto;
+        overflow-y: auto;
     }
 
-
-    * {
-        margin: 0;
-        padding: 0;
-        font-family: 'Montserrat', sans-serif;
-    }
-
-    body {
-        background: #171717;    `
-    }
-    table, th, td{
+    table, th, td {
         border: 1px solid black;
         border-collapse: collapse;
-        
     }
 
     .table-con {
@@ -335,13 +341,11 @@
         overflow-x: auto;
         border: solid 1px black;
         border-radius: 5px;
-
     }
 
-    table {
+    .section-1 table {
         max-width: 100vw;
         padding: 10px;
-
     }
 
     th {
@@ -353,6 +357,7 @@
     td {
         max-height: 40px;
     }
+
     td button {
         margin: 10px 10px 10px 10px;
     }
@@ -360,13 +365,12 @@
     .buttons {
         display: flex;
     }
-    
+
     .dashboard {
         margin: 30px auto 0px auto;
         display: flex;
         flex-direction: column;
         align-items: center;
- 
         max-width: 90vw;
         max-height: 100vh;
         background-color: white;
@@ -376,11 +380,9 @@
     .form {
         max-width: 40vw;
         max-height: 80%;
-
-    
-        display: flex;  
+        display: flex;
     }
-    
+
     form h1 {
         margin-bottom: 20px;
     }
@@ -395,7 +397,6 @@
         border-radius: 10px;
     }
 
-    
     #insert {
         width: 150px;
     }
@@ -412,18 +413,18 @@
         text-align: center;
     }
 
-    button { 
+    button {
         font-size: 1.1rem;
         margin-top: 1rem;
         padding: 10px 5px 10px 5px;
         border-radius: 5px;
         outline: none;
-        border:none;
+        border: none;
         background-color: #004898;
         color: #fff;
         cursor: pointer;
         width: 70px;
-    }   
+    }
 
     button:hover {
         background: blue;
@@ -467,7 +468,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0,0,0,0.5);
+        background-color: rgba(0, 0, 0, 0.5);
     }
 
     .modal-content {
@@ -501,70 +502,81 @@
         cursor: pointer;
     }
 
-    @media screen and (max-width: 800px) {  
-    .topnav a:not(:first-child) {
-        display: none;
-    }
-    .topnav a.icon {
-        float: right;
-        display: block;
-    }
-    .topnav.responsive {
-        position: relative;
-    }
-    .topnav.responsive .icon {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-    .topnav.responsive a {
-        float: none;
-        display: block;
-        text-align: left;
+    #message-box {
+        overflow: hidden;
+        max-width: 300px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1.1rem;
     }
 
-    .section-1 {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        max-width: 100vw;
-        max-height: 100vh;
-        font-size: 10px;
-    }   
-    
-    .table-con {
-        max-width: 80vw;
-        max-height: 100vh
-    }
-    button {
-        width: 50px;
-        font-size: 10px;
-    }
+    @media screen and (max-width: 800px) {
+        .topnav a:not(:first-child) {
+            display: none;
+        }
 
-    form input { 
-        width: 100px;
-        font-size: 10px;
-    }
+        .topnav a.icon {
+            float: right;
+            display: block;
+        }
 
-    #insert {
-        width: 130px;
-        font-size: 10px;
-    }
+        .topnav.responsive {
+            position: relative;
+        }
 
-    #message-button {
-        width: 100px;
-        font-size: 10px;
-    }
+        .topnav.responsive .icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
 
-    .message-table {
-        display: inherit;
-        max-width: 80vw;
-        overflow-x: auto;
-        overflow-y: auto;
+        .topnav.responsive a {
+            float: none;
+            display: block;
+            text-align: left;
+        }
+
+        .section-1 {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 100vw;
+            max-height: 100vh;
+            font-size: 10px;
+        }
+
+        .table-con {
+            max-width: 80vw;
+            max-height: 100vh;
+        }
+
+        button {
+            width: 50px;
+            font-size: 10px;
+        }
+
+        form input {
+            width: 100px;
+            font-size: 10px;
+        }
+
+        #insert {
+            width: 130px;
+            font-size: 10px;
+        }
+
+        #message-button {
+            width: 100px;
+            font-size: 10px;
+        }
+
+        .message-table {
+            display: inherit;
+            max-width: 80vw;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
     }
-    
-    } 
 </style>
-
 
 

@@ -48,7 +48,7 @@
             $users = $this->getUsers();
 
             foreach ($users as $user) {
-                if ($user->getEmail() === $email) {
+                if ($user->getEmail() == $email) {
                     return true;
                 }
             }
@@ -61,21 +61,8 @@
         
             $errorMessage = "";
         
-            if (!preg_match($nameRegex, $username)) {
-                $errorMessage .= 'Please enter a valid username!<br>';
-            }
-        
-            if (!preg_match($emailRegex, $email)) {
-                $errorMessage .= 'Please enter a valid email Address<br>';
-            } 
-        
-            if (strlen($password) < 6) {
-                $errorMessage .= 'Password must be longer than 6!<br>';
-            }
-        
             if ($this->emailExists($email)) {
                 $errorMessage .= 'Email already exists!<br>';
-                echo "<h3 style='color: red; text-align: center;'> Email already exists!</h3>";
             }
             
             return ($errorMessage === "") ? true : $errorMessage;
@@ -86,7 +73,7 @@
             $validation = $this->validateUserData($username, $email, $password);
             
 
-            $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password]')";
+            $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
 
             if ($validation === true) {
                 if(mysqli_query($this->dbconn, $query)) {

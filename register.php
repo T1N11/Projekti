@@ -1,8 +1,12 @@
 <?php
     session_start();
     include 'php/dbconn.php';
-    include 'php/UserController.php'
-;
+    include 'php/UserController.php';
+
+    $dbconn = new DataBaseConnection();
+    $dbconn->startConnection();
+    $database = $dbconn->getConnection();
+    $userController = new UserController($database);
 
     $loggedIn = isset($_SESSION['user-email']);
     if($loggedIn) {
@@ -15,16 +19,12 @@
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirmPassword'];
 
-        $dbconn = new DataBaseConnection();
-        $dbconn->startConnection();
-        $database = $dbconn->getConnection();
-        $userController = new UserController($database);
-
-
         if ($userController->insertUser($username, $email, $password, $confirmPassword)) {
             header("Location: account.php");
             exit();
-        };
+        } else {
+            echo "<h3 style='background-color: red; text-align: center;'> Email already exists!</h3>";
+        }
 
         $dbconn->closeConnection();
     }
@@ -60,7 +60,7 @@
         <h1>MovieOrk</h1>
         <p>Would you like to become a member<br> of the ORK?</p>
 
-        <form action="" method="post" >
+        <form action="" method="post" onsubmit="return validateReg();">
             <div id='error-message' style='color: red;'></div>
             <input type="text" name="username" id="username" placeholder="Enter your name" required>
             <input type="email" name="email" id="email" placeholder="Enter your email..." required>

@@ -23,7 +23,7 @@
         }
     } 
 
-    if($_SESSION['user-role'] === 'admin') {
+    if($_SESSION['user-role'] === 'admin' || !$loggedIn) {
         header("Location: landing.php");
     }
 

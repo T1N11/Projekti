@@ -4,7 +4,9 @@
     include 'php/dbconn.php';
     include 'php/MovieController.php';
 
-    $_SESSION['mov-page'] = $_GET['page'];
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $_SESSION['mov-page'] = $currentPage;
+
     $loggedIn = isset($_SESSION['user-email']);
 
     $dbconn = new DataBaseConnection();
@@ -12,7 +14,6 @@
     $database = $dbconn->getConnection();
     $movieController = new MovieController($database);
 
-    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
     $moviesPerPage = 12; 
     $totalPages = ceil($movieController->totalMovies()/$moviesPerPage);
 
@@ -46,7 +47,7 @@
                 <a href="about.php">About</a>
                 <a href="contact.php" >Contact Us </a>
 
-                 <?php
+                <?php
                     if ($loggedIn) {
                         if ($_SESSION['user-role'] === 'admin') {
                             echo '<a href="dashboard.php">Dashboard</a>';
@@ -120,8 +121,11 @@
                         
                         <h3>About Us</h3>
                         <a href="">Terms of Service</a>
-                        <a href="">About Page</a>
+                        <a href="about.php">About Page</a>
                     </div>
+
+                    <div><p style="font-size: small;">All rights reserved·UBT·2023</p></div>
+                    
                     <div class="contact">
                         <h3>Contact Us</h3>
                         <div class="socials">
@@ -132,7 +136,7 @@
                         
                     </div>
                     
-                    <div><p style="font-size: small;">All rights reserved · UBT · 2023</p></div>
+
                 </div> 
                 
         </footer>

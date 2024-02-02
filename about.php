@@ -81,7 +81,6 @@
                     </div>
 
                     <div class="sub-container-2">
-                        <!-- Slideshow container -->
                         <div class="slideshow-container">
                             <h2 style="text-align: center;">Our Teams!</h2>
                             <div class="mySlides fade">

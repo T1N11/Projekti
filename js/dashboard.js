@@ -30,7 +30,16 @@ function closeUsers() {
 
 }
 
-// Function to close the modal
 function closeModal() {
     document.getElementById('editModal').style.display = 'none';
+}
+
+function openMessage(message) {
+    var decodedMessage = decodeURIComponent(message);
+    document.getElementById("messageContent").innerText = decodedMessage;
+    document.getElementById("messageModal").style.display = "block";
+}
+
+function closeMessageModal() {
+    document.getElementById("messageModal").style.display = "none";
 }

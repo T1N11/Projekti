@@ -38,7 +38,6 @@ class MovieController {
     public function getMovieByID($ID) {
         $query = "SELECT * FROM movies WHERE movieid = '$ID'";
         
-        // Use the mysqli property of your DataBaseConnection class
         $result = mysqli_query($this->dbconn, $query);
     
         if ($result && mysqli_num_rows($result) > 0) {
@@ -87,7 +86,6 @@ class MovieController {
             $movie->setMovieID(mysqli_insert_id($this->dbconn));
             return true;
         } else {
-            // If there was an error, handle it and return false
             echo mysqli_error($this->dbconn);
             return false;
         }
@@ -132,10 +130,17 @@ class MovieController {
 
     public function deleteMovie($movieid) {
         $query = "DELETE from movies where movieid = '$movieid'";
+        $query2 = "DELETE from watchlist where movieid = '$movieid'";
 
-        $complete = mysqli_query($this->dbconn, $query);
+        $watch = mysqli_query($this->dbconn, $query2);
+        
 
-        return $complete;
+        if($watch) {
+            $complete = mysqli_query($this->dbconn, $query);
+            return $complete;
+        }
+        return $watch;
+
     }
 
     function totalMovies() {

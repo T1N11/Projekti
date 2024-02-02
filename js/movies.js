@@ -7,17 +7,17 @@ function resnav() {
     }
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('video')){
+    const img = document.getElementById('info-poster');
 
-
-const img = document.getElementById('info-poster');
-
-    const urlParams = new URLSearchParams(window.location.search);
     const videoLink = urlParams.get('video');
-    console.log(videoLink);
     const videoPlayer = document.getElementById('movie-player');
     const videoSource = document.getElementById('video-source');
 
     videoSource.src = videoLink;
     videoPlayer.play();
+}
+
 
 

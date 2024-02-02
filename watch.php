@@ -51,7 +51,7 @@
         <div class="topnav" id="myTopnav">
             <a href="landing.php">MovieOrk</a>
             <a href="landing.php">Home</a>
-            <a href="movies.php?page=<?= $_SESSION['mov-page'] ?>"  >Movies</a>
+            <a href="movies.php?page=<?= $_SESSION['mov-page'] ?>">Movies</a>
             <a href="about.php" >About</a>
             <a href="contact.php">Contact Us </a>
             <?php
@@ -92,7 +92,7 @@
                 <div class="imdb">
                     <h4>IMDB: </h4>
                     <h4 id="rating"></h4>
-                    <i class="fa fa-star-half-full"><?= $movieDetails->getRating()?></i>
+                    <i class="fa fa-star-half-full">   <?= $movieDetails->getRating()?></i>
                 </div>
 
                 <div class="description-container">
@@ -104,12 +104,15 @@
                     <form action="" method='post' onsubmit="handleWatchlistAction()">
                         <?php  
                         if($loggedIn) {
-                            $isInWatchlist = $movieController->inWatchList($_SESSION['user-email'], $movieId);
+                            if($_SESSION['user-role'] == 'user') {
+                                $isInWatchlist = $movieController->inWatchList($_SESSION['user-email'], $movieId);
 
-                            if ($isInWatchlist) {
-                                echo '<button style="background-color: red;" type="submit" name="remove" id="info-button"><b>-</b>Remove from WatchList</button>';
-                            } else {
-                                echo '<button type="submit" name="add" id="info-button"><b>+</b> Add to WatchList</button>';
+                                if ($isInWatchlist) {
+                                    echo '<button style="background-color: red;" type="submit" name="remove" id="info-button"><b>-</b>Remove from WatchList</button>';
+                                } else {
+                                    echo '<button type="submit" name="add" id="info-button"><b>+</b> Add to WatchList</button>';
+                                }
+    
                             }
                         } 
 

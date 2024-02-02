@@ -86,7 +86,7 @@
                         
                         <h3>About Us</h3>
                         <a href="">Terms of Service</a>
-                        <a href="about.html">About Page</a>
+                        <a href="about.php">About Page</a>
                     </div>
                     <div class="contact">
                         <h3>Contact Us</h3>
