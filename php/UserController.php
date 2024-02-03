@@ -102,10 +102,12 @@
 
             foreach ($users as $user) {
                 if ($user->getUserID() == $userid) {
+                    $watch = "DELETE FROM watchlist WHERE userid = $userid";
                     $query = "DELETE FROM users WHERE userid = $userid";
+                    $remove = mysqli_query($this->dbconn, $watch);
                     $execute = mysqli_query($this->dbconn, $query);
                     
-                    if ($execute) {
+                    if ($remove && $execute) {
                         return true;
                     }
                 }
